@@ -1,14 +1,18 @@
 {
   "name": "@sipuni/amocrm",
   "version": "1.0.0",
-  "description": "An ampCRM API wrapper",
+  "description": "ampCRM API wrapper for Node.js",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "ah@sipuni.com",
+  "author": "Sipuni <ah@sipuni.com>",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sipuni/node-amocrm.git"
   }
 }
