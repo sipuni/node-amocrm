@@ -14,5 +14,8 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/sipuni/node-amocrm.git"
+  },
+  "dependencies": {
+    "axios": "^0.21.0"
   }
 }
