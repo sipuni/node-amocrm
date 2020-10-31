@@ -5,7 +5,13 @@
 * Библиотека использует amoCRM API V4. 
 * Не включает реализацию OAuth.
 
-Пример использования:
+### Установка
+```
+npm i @sipuni/amocrm
+```
+
+
+### Пример использования
 ```
 const AmoCrmAPI = require('@sipuni/amocrm');
 
