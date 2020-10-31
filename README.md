@@ -1,5 +1,7 @@
 # Модуль Node.js для работы с API amoCRM
 
+[![Build Status](https://travis-ci.org/sipuni/node-amocrm.svg?branch=main)](https://travis-ci.org/sipuni/node-amocrm)
+
 ### Описание
 
 * Библиотека использует amoCRM API V4. 
