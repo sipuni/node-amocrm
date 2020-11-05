@@ -5,7 +5,8 @@
 ### Описание
 
 * Библиотека использует amoCRM API V4. 
-* Не включает реализацию OAuth.
+* Работает с access token, но не включает реализацию OAuth
+* Работает с login/hash для старых интеграций
 
 ### Установка
 ```
@@ -13,13 +14,34 @@ npm i @sipuni/amocrm
 ```
 
 
-### Пример использования
+### Примеры использования
+
+C использованием access token.
 ```
 const AmoCrmAPI = require('@sipuni/amocrm');
 
 const accessToken = .... // токен, полученный при помощи OAuth
 
-const amoApi = new AmoCrmAPI('mydomain.amocrm.ru', accessToken);
+const amoApi = new AmoCrmAPI({
+    domain: 'mydomain.amocrm.ru', 
+    accessToken
+});
+
+const lead = await amoApi.createLead({ name: 'New lead' });
+```
+
+С использованием login/hash.
+```
+const AmoCrmAPI = require('@sipuni/amocrm');
+
+const login = ... // Логин пользователя
+const hash = ... // Hash пароля пользователя 
+
+const amoApi = new AmoCrmAPI({
+    domain: 'mydomain.amocrm.ru', 
+    login,
+    hash,
+});
 
 const lead = await amoApi.createLead({ name: 'New lead' });
 ```

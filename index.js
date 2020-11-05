@@ -6,24 +6,32 @@ const valueOrNull = (val) => val ? val : null;
 
 
 class SipuniAmocrm {
-  accessToken = null;
-  domain = '';
+  options = {};
 
-  constructor(domain, accessToken = null) {
-    this.domain = domain;
-    this.accessToken = accessToken;
+  constructor(options) {
+    this.options = options;
+
+    // TODO: validate
   }
 
   async amoApiRequest(method, path, paramsOrData = {}) {
+    const isGet = method === 'GET';
+    const params = isGet ? paramsOrData : {};
+    const data = !isGet ? paramsOrData : {};
     const headers = {
-      'Authorization': `Bearer ${this.accessToken}`,
       'Content-Type': 'application/json'
     };
-    const params = method === 'GET' ? paramsOrData : {};
-    const data = method !== 'GET' ? paramsOrData : {};
+
+    if (this.options.accessToken) {
+      headers['Authorization'] = `Bearer ${this.options.accessToken}`;
+    } else {
+      params['USER_LOGIN'] = this.options.login;
+      params['USER_HASH'] = this.options.hash;
+    }
+
     try {
       const response = await axios.request({
-        url: `https://${this.domain}${apiUrl}${path}`,
+        url: `https://${this.options.domain}${apiUrl}${path}`,
         method,
         data,
         params,
