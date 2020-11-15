@@ -4,7 +4,7 @@
 
 ### Описание
 
-* Библиотека использует amoCRM API V4. 
+* Библиотека использует [amoCRM API V4](https://www.amocrm.ru/developers/content/crm_platform/platform-abilities). 
 * Работает с access token, но не включает реализацию OAuth
 * Работает с login/hash для старых интеграций
 

@@ -39,7 +39,13 @@ class SipuniAmocrm {
       });
       return valueOrNull(response.data);
     } catch (error) {
-      throw new Error(`${error.response.data.title}. ${error.response.data.detail}`);
+      let message = '';
+      if (error.response) {
+        message = `${error.response.data.title}. ${error.response.data.detail}`;
+      } else {
+        message = `${error.message}`;
+      }
+      throw new Error(message);
     }
   }
 
