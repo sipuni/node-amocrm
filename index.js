@@ -183,7 +183,7 @@ class SipuniAmocrm {
     return this.customFieldsCache[entityType];
   }
 
-  preparePhoneFiled(phoneString, phoneEnum = 'WORK') {
+  preparePhoneField(phoneString, phoneEnum = 'WORK') {
     return {
       field_code: 'PHONE',
       values: [
