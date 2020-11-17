@@ -7,11 +7,28 @@ const valueOrNull = (val) => val ? val : null;
 
 class SipuniAmocrm {
   options = {};
+  customFieldsCache = {};
 
   constructor(options) {
     this.options = options;
 
     // TODO: validate
+  }
+
+  async amoApiGetMultipage(data_field, path, paramsOrData = {}) {
+    const result = [];
+    let page = 1;
+    let hasMorePages = true;
+    while(hasMorePages) {
+      const data = await this.amoApiRequest('GET', path, {
+        ...paramsOrData,
+        page,
+      });
+      result.push(...data._embedded[data_field]);
+      hasMorePages = data._page_count > page;
+      page += 1;
+    }
+    return result;
   }
 
   async amoApiRequest(method, path, paramsOrData = {}) {
@@ -157,6 +174,27 @@ class SipuniAmocrm {
       }
     });
   }
+
+  // Custom Fields
+  async getCustomFields(entityType) {
+    if (!this.customFieldsCache[entityType]) {
+      this.customFieldsCache[entityType] = await this.amoApiGetMultipage('custom_fields', `/${entityType}/custom_fields`);
+    }
+    return this.customFieldsCache[entityType];
+  }
+
+  preparePhoneFiled(phoneString, phoneEnum = 'WORK') {
+    return {
+      field_code: 'PHONE',
+      values: [
+        {
+          value: phoneString,
+          enum_code: phoneEnum
+        }
+      ]
+    }
+  }
+
 }
 
 

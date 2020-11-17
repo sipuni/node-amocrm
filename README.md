@@ -17,7 +17,7 @@ npm i @sipuni/amocrm
 ### Примеры использования
 
 C использованием access token.
-```
+```ecmascript 6
 const AmoCrmAPI = require('@sipuni/amocrm');
 
 const accessToken = .... // токен, полученный при помощи OAuth
@@ -31,7 +31,7 @@ const lead = await amoApi.createLead({ name: 'New lead' });
 ```
 
 С использованием login/hash.
-```
+```ecmascript 6
 const AmoCrmAPI = require('@sipuni/amocrm');
 
 const login = ... // Логин пользователя
@@ -78,6 +78,18 @@ async getTask(taskId)
 async createTask(taskProperties)
 async updateTask(taskProperties)
 completeTask(taskId, comment = '')
+```
+
+### Примеры
+
+Создание контакта с телефоном
+```ecmascript 6
+const contact = await amo.createContact({
+    name: 'New contact',
+    custom_fields_values: [
+      amo.preparePhoneFiled('74996474747', 'WORK'),
+    ],
+});
 ```
 
 ### Лицензия
