@@ -59,6 +59,10 @@ class SipuniAmocrm {
       let message = '';
       if (error.response) {
         message = `${error.response.data.title}. ${error.response.data.detail}`;
+        if (error.response.data['validation-errors']) {
+          const validationErrors = JSON.stringify(error.response.data['validation-errors'], null, 2);
+          message += `\n${validationErrors}`;
+        }
       } else {
         message = `${error.message}`;
       }
@@ -74,7 +78,7 @@ class SipuniAmocrm {
 
   async findLeads(query, limit = 10) {
     const result = await this.amoApiRequest('GET', '/leads', {
-      query,
+      ...query,
       limit
     });
     return result?._embedded.leads;
@@ -99,7 +103,7 @@ class SipuniAmocrm {
 
   async findContacts(query, limit = 10) {
     const result = await this.amoApiRequest('GET', '/contacts', {
-      query,
+      ...query,
       limit
     });
     return result?._embedded.contacts;
@@ -123,7 +127,7 @@ class SipuniAmocrm {
 
   async findCompanies(query, limit = 10) {
     const result = await this.amoApiRequest('GET', '/companies', {
-      query,
+      ...query,
       limit
     });
     return result?._embedded.companies;
@@ -173,6 +177,14 @@ class SipuniAmocrm {
         text: comment
       }
     });
+  }
+
+  async findTasks(query, limit = 10) {
+    const result = await this.amoApiRequest('GET', '/tasks', {
+      ...query,
+      limit
+    });
+    return result?._embedded.tasks;
   }
 
   // Custom Fields

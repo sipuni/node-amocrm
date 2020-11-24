@@ -16,35 +16,6 @@ npm i @sipuni/amocrm
 
 ### Примеры использования
 
-C использованием access token.
-```ecmascript 6
-const AmoCrmAPI = require('@sipuni/amocrm');
-
-const accessToken = .... // токен, полученный при помощи OAuth
-
-const amoApi = new AmoCrmAPI({
-    domain: 'mydomain.amocrm.ru', 
-    accessToken
-});
-
-const lead = await amoApi.createLead({ name: 'New lead' });
-```
-
-С использованием login/hash.
-```ecmascript 6
-const AmoCrmAPI = require('@sipuni/amocrm');
-
-const login = ... // Логин пользователя
-const hash = ... // Hash пароля пользователя 
-
-const amoApi = new AmoCrmAPI({
-    domain: 'mydomain.amocrm.ru', 
-    login,
-    hash,
-});
-
-const lead = await amoApi.createLead({ name: 'New lead' });
-```
 
 ### Реализованные методы
 
@@ -82,13 +53,64 @@ completeTask(taskId, comment = '')
 
 ### Примеры
 
+Авторизация с использованием access token и создание сделки
+```ecmascript 6
+const AmoCrmAPI = require('@sipuni/amocrm');
+
+const accessToken = .... // токен, полученный при помощи OAuth
+
+const amoApi = new AmoCrmAPI({
+    domain: 'mydomain.amocrm.ru', 
+    accessToken
+});
+
+const lead = await amoApi.createLead({ name: 'New lead' });
+```
+
+Авторизация с использованием login/hash и создание сделки
+```ecmascript 6
+const AmoCrmAPI = require('@sipuni/amocrm');
+
+const login = ... // Логин пользователя
+const hash = ... // Hash пароля пользователя 
+
+const amoApi = new AmoCrmAPI({
+    domain: 'mydomain.amocrm.ru', 
+    login,
+    hash,
+});
+
+const lead = await amoApi.createLead({ name: 'New lead' });
+```
+
 Создание контакта с телефоном
 ```ecmascript 6
 const contact = await amo.createContact({
     name: 'New contact',
     custom_fields_values: [
-      amo.preparePhoneFiled('74996474747', 'WORK'),
+      amo.preparePhoneField('74996474747', 'WORK'),
     ],
+});
+```
+
+Создание задачи с привязкой к контакту
+```ecmascript 6
+const timestamp = Math.ceil((new Date()).getTime()/1000);
+const task = await amo.createTask({
+    entity_id: contactId,
+    entity_type: 'contacts',
+    text: 'Call back a customer',
+    complete_till: timestamp + 60*60*24,
+});
+```
+
+Поиск незавершенной задачи для ответсвенного и заданного контакта
+```ecmascript 6
+const existing = await amo.findTasks({
+    'filter[responsible_user_id]': amoUserId,
+    'filter[is_completed]': 0,
+    'filter[entity_type]': 'contacts',
+    'filter[entity_id]': contactId,
 });
 ```
 
