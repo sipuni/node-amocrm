@@ -13,10 +13,6 @@
 npm i @sipuni/amocrm
 ```
 
-
-### Примеры использования
-
-
 ### Реализованные методы
 
 Сделки
@@ -53,7 +49,7 @@ completeTask(taskId, comment = '')
 
 ### Примеры
 
-Авторизация с использованием access token и создание сделки
+**Авторизация с использованием access token и создание сделки**
 ```ecmascript 6
 const AmoCrmAPI = require('@sipuni/amocrm');
 
@@ -67,7 +63,7 @@ const amoApi = new AmoCrmAPI({
 const lead = await amoApi.createLead({ name: 'New lead' });
 ```
 
-Авторизация с использованием login/hash и создание сделки
+**Авторизация с использованием login/hash и создание сделки**
 ```ecmascript 6
 const AmoCrmAPI = require('@sipuni/amocrm');
 
@@ -83,7 +79,7 @@ const amoApi = new AmoCrmAPI({
 const lead = await amoApi.createLead({ name: 'New lead' });
 ```
 
-Создание контакта с телефоном
+**Создание контакта с телефоном**
 ```ecmascript 6
 const contact = await amo.createContact({
     name: 'New contact',
@@ -93,7 +89,7 @@ const contact = await amo.createContact({
 });
 ```
 
-Создание задачи с привязкой к контакту
+**Создание задачи с привязкой к контакту**
 ```ecmascript 6
 const timestamp = Math.ceil((new Date()).getTime()/1000);
 const task = await amo.createTask({
@@ -104,7 +100,7 @@ const task = await amo.createTask({
 });
 ```
 
-Поиск незавершенной задачи для ответсвенного и заданного контакта
+**Поиск незавершенной задачи для ответсвенного и заданного контакта**
 ```ecmascript 6
 const existing = await amo.findTasks({
     'filter[responsible_user_id]': amoUserId,
@@ -116,4 +112,4 @@ const existing = await amo.findTasks({
 
 ### Лицензия
 
-MIT
+[MIT](https://ru.wikipedia.org/wiki/%D0%9B%D0%B8%D1%86%D0%B5%D0%BD%D0%B7%D0%B8%D1%8F_MIT) © [Sipuni](http://sipuni.com)
