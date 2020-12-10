@@ -58,10 +58,15 @@ class SipuniAmocrm {
     } catch (error) {
       let message = '';
       if (error.response) {
-        message = `${error.response.data.title}. ${error.response.data.detail}`;
+        if (error.response.data.title) {
+          message = `${error.response.data.title}. ${error.response.data.detail}`;
+        }
         if (error.response.data['validation-errors']) {
           const validationErrors = JSON.stringify(error.response.data['validation-errors'], null, 2);
           message += `\n${validationErrors}`;
+        }
+        if (!message) {
+          message = `${error.response.status} ${error.response.statusText}`;
         }
       } else {
         message = `${error.message}`;
