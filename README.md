@@ -15,36 +15,47 @@ npm i @sipuni/amocrm
 
 ### Реализованные методы
 
-Сделки
+Методы сгруппированы и доступны через соответствующие свойства у объекта класса AmoCrmAPI.
+Все методы возвращают Promise
+```ecmascript 6
+const ampApi = new AmoCrmAPI(..)
 ```
-getLead(leadId)
-async findLeads(query, limit = 10)
-async createLead(leadProperties)
-async updateLead(leadProperties)
+
+Сделки
+```ecmascript 6
+ampApi.leads.get(leadId)
+ampApi.leads.list(query, limit = 10)
+ampApi.leads.create(leadProperties)
+ampApi.leads.update(leadProperties)
 ```
 
 Контакты
-```
-getContact(contactId)
-async findContacts(query, limit = 10)
-async createContact(contactProperties)
-async updateContact(contactProperties)
+```ecmascript 6
+ampApi.contacts.get(contactId)
+ampApi.contacts.list(query, limit = 10)
+ampApi.contacts.create(contactProperties)
+ampApi.contacts.update(contactProperties)
 ```
 
 Компании
-```
-getCompany(companyId)
-async findCompanies(query, limit = 10)
-async createCompany(companyProperties)
-async updateCompany(companyProperties)
+```ecmascript 6
+ampApi.companies.get(companyId)
+ampApi.companies.list(query, limit = 10)
+ampApi.companies.create(companyProperties)
+ampApi.companies.update(companyProperties)
 ```
 
 Задачи
+```ecmascript 6
+ampApi.tasks.get(taskId)
+ampApi.tasks.list(query, limit = 10)
+ampApi.tasks.create(taskProperties)
+ampApi.tasks.update(taskProperties)
 ```
-async getTask(taskId)
-async createTask(taskProperties)
-async updateTask(taskProperties)
-completeTask(taskId, comment = '')
+
+Звонки
+```ecmascript 6
+ampApi.calls.create(taskProperties)
 ```
 
 ### Примеры
@@ -60,7 +71,7 @@ const amoApi = new AmoCrmAPI({
     accessToken
 });
 
-const lead = await amoApi.createLead({ name: 'New lead' });
+const lead = await amoApi.leads.create({ name: 'New lead' });
 ```
 
 **Авторизация с использованием login/hash и создание сделки**
@@ -76,12 +87,12 @@ const amoApi = new AmoCrmAPI({
     hash,
 });
 
-const lead = await amoApi.createLead({ name: 'New lead' });
+const lead = await amoApi.leads.create({ name: 'New lead' });
 ```
 
 **Создание контакта с телефоном**
 ```ecmascript 6
-const contact = await amo.createContact({
+const contact = await amo.contacts.create({
     name: 'New contact',
     custom_fields_values: [
       amo.preparePhoneField('74996474747', 'WORK'),
@@ -92,7 +103,7 @@ const contact = await amo.createContact({
 **Создание задачи с привязкой к контакту**
 ```ecmascript 6
 const timestamp = Math.ceil((new Date()).getTime()/1000);
-const task = await amo.createTask({
+const task = await amo.tasks.create({
     entity_id: contactId,
     entity_type: 'contacts',
     text: 'Call back a customer',
@@ -100,14 +111,26 @@ const task = await amo.createTask({
 });
 ```
 
-**Поиск незавершенной задачи для ответсвенного и заданного контакта**
+**Поиск незавершенной задачи для ответственного и заданного контакта**
 ```ecmascript 6
-const existing = await amo.findTasks({
+const existing = await amo.tasks.list({
     'filter[responsible_user_id]': amoUserId,
     'filter[is_completed]': 0,
     'filter[entity_type]': 'contacts',
     'filter[entity_id]': contactId,
 });
+```
+
+**Произвольный запрос к amoCRM API**
+
+Поскольку не для всех сущностей реализованы методы, можно вызывать API методы amoCRM напрямую, при 
+помощи метода request.
+```ecmascript 6
+const lead = await amo.request('POST', '/leads', {
+  name: 'New lead'
+});
+
+const task = await amo.request('GET', '/leads/124212');
 ```
 
 ### Лицензия

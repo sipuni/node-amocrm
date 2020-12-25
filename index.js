@@ -4,34 +4,105 @@ const apiUrl = '/api/v4';
 
 const valueOrNull = (val) => val ? val : null;
 
+function trim(str, ch) {
+  let start = 0, end = str.length;
+
+  while(start < end && str[start] === ch)
+      ++start;
+
+  while(end > start && str[end - 1] === ch)
+      --end;
+
+  return (start > 0 || end < str.length) ? str.substring(start, end) : str;
+}
+
+function firstOrNull(arr) {
+  if (Array.isArray(arr)) {
+    return arr[0] || null;
+  }
+  return null;
+}
+
+class CRUDMethods {
+
+  constructor (api, entity) {
+    this.entity = entity;
+    this.api = api;
+  }
+
+  async get(id) {
+    return this.api.getEntity(`/${this.entity}`, id);
+  }
+
+  async create(properties) {
+    return this.api.createEntity(`/${this.entity}`, properties);
+  }
+
+  async update(properties) {
+    return this.api.updateEntity(`/${this.entity}`, properties);
+  }
+
+  async list(query, limit=10) {
+    return this.api.listEntity(`/${this.entity}`, query, limit);
+  }
+
+  async delete(id) {
+
+  }
+}
+
+class CallsMethods {
+  constructor (api) {
+    this.entity = 'calls';
+    this.api = api;
+  }
+
+  async create(properties) {
+    return this.api.createEntity(`/${this.entity}`, properties);
+  }
+}
 
 class SipuniAmocrm {
   options = {};
   customFieldsCache = {};
+  cachedMethodsObjects = {};
 
   constructor(options) {
     this.options = options;
-
-    // TODO: validate
   }
 
-  async amoApiGetMultipage(data_field, path, paramsOrData = {}) {
-    const result = [];
-    let page = 1;
-    let hasMorePages = true;
-    while(hasMorePages) {
-      const data = await this.amoApiRequest('GET', path, {
-        ...paramsOrData,
-        page,
-      });
-      result.push(...data._embedded[data_field]);
-      hasMorePages = data._page_count > page;
-      page += 1;
+  _getMethodsObject(entity, className) {
+    if (!this.cachedMethodsObjects[entity]) {
+      this.cachedMethodsObjects[entity] = new className(this, entity);
     }
-    return result;
+    return this.cachedMethodsObjects[entity];
   }
 
-  async amoApiRequest(method, path, paramsOrData = {}) {
+  // API methods grouped by entity
+
+  get tasks() {
+    return this._getMethodsObject('tasks', CRUDMethods);
+  }
+
+  get leads() {
+    return this._getMethodsObject('leads', CRUDMethods);
+  }
+
+  get companies() {
+    return this._getMethodsObject('companies', CRUDMethods);
+  }
+
+  get contacts() {
+    return this._getMethodsObject('contacts', CRUDMethods);
+  }
+
+  get calls() {
+    return this._getMethodsObject('calls', CallsMethods);
+  }
+
+  // Universal requests
+
+  async request(method, path, paramsOrData = {}) {
     const isGet = method === 'GET';
     const params = isGet ? paramsOrData : {};
     const data = !isGet ? paramsOrData : {};
@@ -56,6 +127,7 @@ class SipuniAmocrm {
       });
       return valueOrNull(response.data);
     } catch (error) {
+      console.log(error.response.data);
       let message = '';
       if (error.response) {
         if (error.response.data.title) {
@@ -75,14 +147,61 @@ class SipuniAmocrm {
     }
   }
 
+  async requestMultipage(data_field, path, params = {}) {
+    const result = [];
+    let page = 1;
+    let hasMorePages = true;
+    while(hasMorePages) {
+      const data = await this.request('GET', path, {
+        ...params,
+        page,
+      });
+      result.push(...data._embedded[data_field]);
+      hasMorePages = data._page_count > page;
+      page += 1;
+    }
+    return result;
+  }
+
+  async _entityRequest(method, path, paramsOrData, singleResult = true) {
+    const result = await this.request(method, path, paramsOrData);
+    const entity = trim(path, '/');
+    if (singleResult) {
+      return firstOrNull(result && result._embedded[entity]);
+    } else {
+      return result && result._embedded && result._embedded[entity];
+    }
+  }
+
+  async getEntity(path, itemId) {
+    return this.request('GET', `${path}/${itemId}`, {});
+  }
+
+  async listEntity(path, query, limit=10) {
+    return this._entityRequest('GET', path,
+      {
+      ...query,
+      limit
+      },
+      false);
+  }
+
+  async createEntity(path, properties) {
+    return this._entityRequest('POST', path, [properties], true);
+  }
+
+  async updateEntity(path, properties) {
+    return this._entityRequest('PATCH', path, [properties], true);
+  }
+
   // Leads
 
-  getLead(leadId) {
-    return this.amoApiRequest('GET', `/leads/${leadId}`);
+  async getLead(leadId) {
+    return this.getEntity('/leads', leadId);
   }
 
   async findLeads(query, limit = 10) {
-    const result = await this.amoApiRequest('GET', '/leads', {
+    const result = await this.request('GET', '/leads', {
       ...query,
       limit
     });
@@ -90,12 +209,12 @@ class SipuniAmocrm {
   }
 
   async createLead(leadProperties) {
-    const result = await this.amoApiRequest('POST', '/leads', [leadProperties]);
+    const result = await this.request('POST', '/leads', [leadProperties]);
     return result._embedded.leads.shift();
   }
 
   async updateLead(leadProperties) {
-    const result = await this.amoApiRequest('PATCH', '/leads', [leadProperties]);
+    const result = await this.request('PATCH', '/leads', [leadProperties]);
     return result._embedded.leads.shift();
   }
 
@@ -103,11 +222,11 @@ class SipuniAmocrm {
   // Contacts
 
   getContact(contactId) {
-    return this.amoApiRequest('GET', `/contacts/${contactId}`);
+    return this.request('GET', `/contacts/${contactId}`);
   }
 
   async findContacts(query, limit = 10) {
-    const result = await this.amoApiRequest('GET', '/contacts', {
+    const result = await this.request('GET', '/contacts', {
       ...query,
       limit
     });
@@ -115,23 +234,23 @@ class SipuniAmocrm {
   }
 
   async createContact(contactProperties) {
-    const result = await this.amoApiRequest('POST', '/contacts', [contactProperties]);
+    const result = await this.request('POST', '/contacts', [contactProperties]);
     return result._embedded.contacts.shift();
   }
 
   async updateContact(contactProperties) {
-    const result = await this.amoApiRequest('PATCH', '/contacts', [contactProperties]);
+    const result = await this.request('PATCH', '/contacts', [contactProperties]);
     return result._embedded.contacts.shift();
   }
 
   // Companies
 
   getCompany(companyId) {
-    return this.amoApiRequest('GET', `/companies/${companyId}`);
+    return this.request('GET', `/companies/${companyId}`);
   }
 
   async findCompanies(query, limit = 10) {
-    const result = await this.amoApiRequest('GET', '/companies', {
+    const result = await this.request('GET', '/companies', {
       ...query,
       limit
     });
@@ -139,38 +258,28 @@ class SipuniAmocrm {
   }
 
   async createCompany(companyProperties) {
-    const result = await this.amoApiRequest('POST', '/companies', [companyProperties]);
+    const result = await this.request('POST', '/companies', [companyProperties]);
     return result._embedded.companies.shift();
   }
 
   async updateCompany(companyProperties) {
-    const result = await this.amoApiRequest('PATCH', '/companies', [companyProperties]);
+    const result = await this.request('PATCH', '/companies', [companyProperties]);
     return result._embedded.companies.shift();
-  }
-
-  // Pipelines
-
-  async getPipeline(id) {
-
-  }
-
-  async createPipeline(pipelineProperties) {
-
   }
 
   // Tasks
 
   async getTask(taskId) {
-    return this.amoApiRequest('GET', `/tasks/${taskId}`);
+    return this.request('GET', `/tasks/${taskId}`);
   }
 
   async createTask(taskProperties) {
-    const result = await this.amoApiRequest('POST', '/tasks', [taskProperties]);
+    const result = await this.request('POST', '/tasks', [taskProperties]);
     return result._embedded.tasks.shift();
   }
 
   async updateTask(taskProperties) {
-    const result = await this.amoApiRequest('PATCH', '/tasks', [taskProperties]);
+    const result = await this.request('PATCH', '/tasks', [taskProperties]);
     return result._embedded.tasks.shift();
   }
 
@@ -185,7 +294,7 @@ class SipuniAmocrm {
   }
 
   async findTasks(query, limit = 10) {
-    const result = await this.amoApiRequest('GET', '/tasks', {
+    const result = await this.request('GET', '/tasks', {
       ...query,
       limit
     });
@@ -195,7 +304,7 @@ class SipuniAmocrm {
   // Custom Fields
   async getCustomFields(entityType) {
     if (!this.customFieldsCache[entityType]) {
-      this.customFieldsCache[entityType] = await this.amoApiGetMultipage('custom_fields', `/${entityType}/custom_fields`);
+      this.customFieldsCache[entityType] = await this.requestMultipage('custom_fields', `/${entityType}/custom_fields`);
     }
     return this.customFieldsCache[entityType];
   }
