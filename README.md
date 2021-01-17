@@ -15,12 +15,13 @@ npm i @sipuni/amocrm
 
 ### Реализованные методы
 
-Методы сгруппированы и доступны через соответствующие свойства у объекта класса AmoCrmAPI.
+Методы сгруппированы и доступны через соответствующие свойства у объекта класса SipuniAmocrm.
 Все методы возвращают Promise.
 
-Для списка методов ниже предположим, что amoApi это объект класса AmoCrmAPI
+Для списка методов ниже предположим, что amoApi это объект класса SipuniAmoCrm
 ```ecmascript 6
-const amoApi = new AmoCrmAPI(..)
+const SipuniAmoCrm = require('@sipuni/amocrm');
+const amoApi = new SipuniAmocrm(..)
 ```
 
 Сделки
