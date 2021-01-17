@@ -1,6 +1,6 @@
 {
   "name": "@sipuni/amocrm",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "ampCRM API wrapper for Node.js",
   "main": "index.js",
   "scripts": {
@@ -21,6 +21,6 @@
     "api"
   ],
   "dependencies": {
-    "axios": "^0.21.0"
+    "axios": "^0.21.1"
   }
 }
