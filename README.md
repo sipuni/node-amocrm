@@ -16,46 +16,48 @@ npm i @sipuni/amocrm
 ### Реализованные методы
 
 Методы сгруппированы и доступны через соответствующие свойства у объекта класса AmoCrmAPI.
-Все методы возвращают Promise
+Все методы возвращают Promise.
+
+Для списка методов ниже предположим, что amoApi это объект класса AmoCrmAPI
 ```ecmascript 6
-const ampApi = new AmoCrmAPI(..)
+const amoApi = new AmoCrmAPI(..)
 ```
 
 Сделки
 ```ecmascript 6
-ampApi.leads.get(leadId)
-ampApi.leads.list(query, limit = 10)
-ampApi.leads.create(leadProperties)
-ampApi.leads.update(leadProperties)
+amoApi.leads.get(leadId)
+amoApi.leads.list(query, limit = 10)
+amoApi.leads.create(leadProperties)
+amoApi.leads.update(leadProperties)
 ```
 
 Контакты
 ```ecmascript 6
-ampApi.contacts.get(contactId)
-ampApi.contacts.list(query, limit = 10)
-ampApi.contacts.create(contactProperties)
-ampApi.contacts.update(contactProperties)
+amoApi.contacts.get(contactId)
+amoApi.contacts.list(query, limit = 10)
+amoApi.contacts.create(contactProperties)
+amoApi.contacts.update(contactProperties)
 ```
 
 Компании
 ```ecmascript 6
-ampApi.companies.get(companyId)
-ampApi.companies.list(query, limit = 10)
-ampApi.companies.create(companyProperties)
-ampApi.companies.update(companyProperties)
+amoApi.companies.get(companyId)
+amoApi.companies.list(query, limit = 10)
+amoApi.companies.create(companyProperties)
+amoApi.companies.update(companyProperties)
 ```
 
 Задачи
 ```ecmascript 6
-ampApi.tasks.get(taskId)
-ampApi.tasks.list(query, limit = 10)
-ampApi.tasks.create(taskProperties)
-ampApi.tasks.update(taskProperties)
+amoApi.tasks.get(taskId)
+amoApi.tasks.list(query, limit = 10)
+amoApi.tasks.create(taskProperties)
+amoApi.tasks.update(taskProperties)
 ```
 
 Звонки
 ```ecmascript 6
-ampApi.calls.create(taskProperties)
+amoApi.calls.create(taskProperties)
 ```
 
 ### Примеры
@@ -126,11 +128,13 @@ const existing = await amo.tasks.list({
 Поскольку не для всех сущностей реализованы методы, можно вызывать API методы amoCRM напрямую, при 
 помощи метода request.
 ```ecmascript 6
+// создание сделки
 const lead = await amo.request('POST', '/leads', {
   name: 'New lead'
 });
 
-const task = await amo.request('GET', '/leads/124212');
+// получение задачи
+const task = await amo.request('GET', '/tasks/124212');
 ```
 
 ### Лицензия
