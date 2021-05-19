@@ -186,12 +186,24 @@ class SipuniAmocrm {
       false);
   }
 
+  _getParamsArray(params) {
+    if (params instanceof Array) {
+      return params;
+    } else if(params instanceof Object) {
+      return [params];
+    } else {
+      throw new Error('Expected array or object');
+    }
+  }
+
   async createEntity(path, properties) {
-    return this._entityRequest('POST', path, [properties], true);
+    const singeResult = !(properties instanceof Array);
+    return this._entityRequest('POST', path, this._getParamsArray(properties), singeResult);
   }
 
   async updateEntity(path, properties) {
-    return this._entityRequest('PATCH', path, [properties], true);
+    const singeResult = !(properties instanceof Array);
+    return this._entityRequest('PATCH', path, this._getParamsArray(properties), singeResult);
   }
 
   // Leads
